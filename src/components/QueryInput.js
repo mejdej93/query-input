@@ -4,7 +4,8 @@ import './queryInput.scss';
 
 const ICONS = {
     ANIMALS: 'fa fa-paw fa-2x has-text-primary',
-    COMMANDS: 'fa fa-chain fa-2x has-text-danger',
+    COMMANDS: 'fa fa-link fa-2x',
+    COLORS: 'fa fa-eye-dropper fa-2x has-text-danger',
 };
 
 const ANIMALS = {
@@ -32,12 +33,6 @@ const COMMANDS = {
     NOT: 'not'
 };
 
-const STATE_OPTIONS = {
-    [STATES.ANIMAL]: ANIMALS,
-    [STATES.COLOR]: COLORS,
-    UNIVERSAL: COMMANDS
-};
-
 const ALL = {
     ANIMALS,
     COMMANDS,
@@ -46,12 +41,10 @@ const ALL = {
 
 const findIcon = value => {
     const category = Object.keys(ALL)
-        .map(key => Object.values(ALL[key]).find((el) => el === value) ? key : null)
+        .map(key => Object.values(ALL[key]).find((el) => el.toLowerCase() === value.toLowerCase()) ? key : null)
         .filter(value => value !== null)[0];
     return ICONS[category];
 };
-
-findIcon('DOG');
 
 export class QueryInput extends Component {
 
@@ -78,7 +71,7 @@ export class QueryInput extends Component {
             newQuery.pop();
 
             return {
-                query: `${newQuery.join(' ')} ${option.value}`,
+                query: `${newQuery.join(' ')} ${option.value} `,
                 isDropdownActive: false
             }
         }, this.focusInput);
@@ -86,15 +79,19 @@ export class QueryInput extends Component {
 
     filterQueryOptions = option => {
         const lastWord = this.state.query.split(" ").pop();
-        return option.value.includes(lastWord);
+        return option.value.toLowerCase().includes(lastWord.toLowerCase());
     };
 
     render() {
 
-        let currentOptions = [...Object.values(STATE_OPTIONS[this.state.queryStep]), ...Object.values(STATE_OPTIONS.UNIVERSAL)]
+        let currentOptions = [
+            ...Object.values(ALL.ANIMALS),
+            ...Object.values(ALL.COMMANDS),
+            ...Object.values(ALL.COLORS)
+        ]
             .map(option => ({
                 value: option,
-                icon: findIcon(option)
+                iconName: findIcon(option)
             }))
             .filter(this.filterQueryOptions);
 
@@ -128,7 +125,7 @@ export class QueryInput extends Component {
                                                onClick={() => this.selectOption(option)}
                                             >
                                         <span className="icon mr-3">
-                                            <i className={option.icon}></i>
+                                            <i className={option.iconName}></i>
                                         </span>
                                                 {option.value.toLowerCase()}
                                             </a>
