@@ -4,10 +4,10 @@ import {QueryInput} from './components/QueryInput';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="app">
+      <div className="app-container">
         <QueryInput />
-      </header>
+      </div>
     </div>
   );
 }
