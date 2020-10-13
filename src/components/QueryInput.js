@@ -1,11 +1,12 @@
 import React, {Component} from 'react';
-import classNames from 'classnames';
 import './queryInput.scss';
 
 const ICONS = {
     ANIMALS: 'fa fa-paw fa-2x has-text-primary',
     COMMANDS: 'fa fa-link fa-2x',
     COLORS: 'fa fa-eye-dropper fa-2x has-text-danger',
+    FIELD_NAMES: 'fa fa-cog fa-2x has-text-info',
+    SIZE: 'fa fa-bullseye fa-2x has-text-warning'
 };
 
 const ANIMALS = {
@@ -16,9 +17,9 @@ const ANIMALS = {
 };
 
 const COLORS = {
-    RED: 'RED',
-    BLUE: 'BLUE',
-    YELLOW: 'YELLOW'
+    RED: '"RED"',
+    BLUE: '"BLUE"',
+    YELLOW: '"YELLOW"'
 };
 
 const STATES = {
@@ -33,10 +34,24 @@ const COMMANDS = {
     NOT: 'not'
 };
 
+const FIELD_NAMES = {
+    COLOR: 'color',
+    SIZE: 'size',
+    type: 'type'
+};
+
+const SIZE = {
+    SMALL: 'small',
+    MEDIUM: 'medium',
+    BIG: 'big'
+};
+
 const ALL = {
     ANIMALS,
     COMMANDS,
-    COLORS
+    COLORS,
+    FIELD_NAMES,
+    SIZE
 };
 
 const findIcon = value => {
@@ -50,7 +65,6 @@ export class QueryInput extends Component {
 
     state = {
         query: '',
-        isDropdownActive: false,
         queryStep: STATES.ANIMAL
     };
 
@@ -60,8 +74,7 @@ export class QueryInput extends Component {
 
     onChange = ({target: {value: query}}) => {
         this.setState({
-            query,
-            isDropdownActive: true
+            query
         });
     };
 
@@ -71,15 +84,14 @@ export class QueryInput extends Component {
             newQuery.pop();
 
             return {
-                query: `${newQuery.join(' ')} ${option.value} `,
-                isDropdownActive: false
+                query: `${newQuery.join(' ')} ${option.value} `
             }
         }, this.focusInput);
     };
 
     filterQueryOptions = option => {
         const lastWord = this.state.query.split(" ").pop();
-        return option.value.toLowerCase().includes(lastWord.toLowerCase());
+        return option.value.toLowerCase().startsWith(lastWord.toLowerCase().replace("\"", ''));
     };
 
     render() {
@@ -87,7 +99,9 @@ export class QueryInput extends Component {
         let currentOptions = [
             ...Object.values(ALL.ANIMALS),
             ...Object.values(ALL.COMMANDS),
-            ...Object.values(ALL.COLORS)
+            ...Object.values(ALL.COLORS),
+            ...Object.values(ALL.FIELD_NAMES),
+            ...Object.values(ALL.SIZE)
         ]
             .map(option => ({
                 value: option,
@@ -95,14 +109,8 @@ export class QueryInput extends Component {
             }))
             .filter(this.filterQueryOptions);
 
-        const dropdownClasses = classNames({
-            'query-input': true,
-            'dropdown': true,
-            'is-active': this.state.isDropdownActive
-        });
-
         return (
-            <div className={dropdownClasses}>
+            <div className="dropdown is-active query-input">
                 <div className="dropdown-trigger">
                     <input className="input"
                            ref={el => this.inputRef = el}
@@ -120,7 +128,7 @@ export class QueryInput extends Component {
                                 {
                                     currentOptions
                                         .map(option => (
-                                            <a className="dropdown-item has-text-left"
+                                            <a className="dropdown-item"
                                                key={option.value}
                                                onClick={() => this.selectOption(option)}
                                             >
